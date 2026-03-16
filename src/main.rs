@@ -1,4 +1,16 @@
+mod physics;
+mod utils;
+mod integrators;
+
 use clap::Parser;
+use physics::body::Body;
+use nalgebra::Vector3;
+
+use physics::gravity::compute_accelerations;
+use integrators::euler::EulerIntegrator;
+
+use crate::integrators::Integrator;
+
 
 #[derive(Parser, Debug)]
 struct Args {
@@ -10,4 +22,30 @@ fn main() {
     let args = Args::parse();
 
     println!("Running simulation with {} steps", args.steps);
+
+    let mut bodies = vec![
+        Body::new(
+            "Sun".to_string(),
+            1.989e30,
+            Vector3::new(0.0, 0.0, 0.0),
+            Vector3::zeros(),
+        ),
+        Body::new(
+            "Earth".to_string(),
+            5.972e24,
+            Vector3::new(1.496e11, 0.0, 0.0),
+            Vector3::new(0.0, 29780.0, 0.0),
+        ),
+    ];
+
+    let integrator = EulerIntegrator;
+    let dt = 60.0;
+
+    for _ in 0..10 {
+        compute_accelerations(&mut bodies);
+
+        integrator.step(&mut bodies, dt);
+
+        println!("Earth position: {:?}", bodies[1].position);
+    }
 }
