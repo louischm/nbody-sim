@@ -3,6 +3,7 @@ mod utils;
 mod integrators;
 mod simulation;
 mod diagnostics;
+mod config;
 
 use clap::Parser;
 use physics::body::Body;
@@ -11,6 +12,7 @@ use nalgebra::Vector3;
 use integrators::leapfrog::LeapfrogIntegrator;
 use integrators::euler::EulerIntegrator;
 use simulation::engine::SimulationEngine;
+use config::simulation::load_config;
 
 
 #[derive(Parser, Debug)]
@@ -24,26 +26,21 @@ fn main() {
 
     println!("Running simulation with {} steps", args.steps);
 
-    let bodies = vec![
+    let config = load_config("config/simulation.json");
+     
+    let bodies = config.bodies.into_iter().map(|b| {
         Body::new(
-            "Sun".to_string(),
-            1.989e30,
-            Vector3::new(0.0, 0.0, 0.0),
-            Vector3::zeros(),
-        ),
-        Body::new(
-            "Earth".to_string(),
-            5.972e24,
-            Vector3::new(1.496e11, 0.0, 0.0),
-            Vector3::new(0.0, 29780.0, 0.0),
-        ),
-    ];
+            b.name,
+            b.mass,
+            Vector3::new(b.position[0], b.position[1], b.position[2]),
+            Vector3::new(b.velocity[0], b.velocity[1], b.velocity[2]),
+        )
+    }).collect();
 
     let leapfrog = LeapfrogIntegrator;
   //  let euler = EulerIntegrator;
-    let dt = 60.0;
 
-    let mut engine_leapfrog = SimulationEngine::new(bodies, leapfrog, dt);
+    let mut engine_leapfrog = SimulationEngine::new(bodies, leapfrog, config.dt);
     //let mut engine_euler = SimulationEngine::new(bodies, euler, dt);
     
     engine_leapfrog.run(args.steps);
