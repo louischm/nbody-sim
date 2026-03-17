@@ -2,12 +2,14 @@ mod physics;
 mod utils;
 mod integrators;
 mod simulation;
+mod diagnostics;
 
 use clap::Parser;
 use physics::body::Body;
 use nalgebra::Vector3;
 
 use integrators::leapfrog::LeapfrogIntegrator;
+use integrators::euler::EulerIntegrator;
 use simulation::engine::SimulationEngine;
 
 
@@ -37,10 +39,13 @@ fn main() {
         ),
     ];
 
-    let integrator = LeapfrogIntegrator;
+    let leapfrog = LeapfrogIntegrator;
+  //  let euler = EulerIntegrator;
     let dt = 60.0;
 
-    let mut engine = SimulationEngine::new(bodies, integrator, dt);
+    let mut engine_leapfrog = SimulationEngine::new(bodies, leapfrog, dt);
+    //let mut engine_euler = SimulationEngine::new(bodies, euler, dt);
     
-    engine.run(args.steps);
+    engine_leapfrog.run(args.steps);
+    //engine_euler.run(args.steps);
 }

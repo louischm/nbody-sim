@@ -1,6 +1,7 @@
 use crate::physics::body::Body;
 use crate::integrators::Integrator;
 use crate::physics::gravity::compute_accelerations;
+use crate::diagnostics::energy::total_energy;
 
 pub struct SimulationEngine<I: Integrator> {
     pub bodies: Vec<Body>,
@@ -23,13 +24,22 @@ impl<I: Integrator> SimulationEngine<I> {
     }
 
     pub fn run(&mut self, steps: usize) {
+        let mut initial_energy = total_energy(&self.bodies);
+
         for step in 0..steps {
             self.step();
 
-            // tmp debug
             if step % 10 == 0 {
-                println!("Step {}", step);
-                println!("First body position: {:?}", self.bodies[0].position);
+                let energy = total_energy(&self.bodies);
+                let relative_error = (energy - initial_energy) / initial_energy.abs();
+
+                println!(
+                    "Step {} | Energy: {:.3e} | Delta: {:.3e} | Rel: {:.3e}", 
+                    step,
+                    energy,
+                    energy - initial_energy,
+                    relative_error,
+                );
             }
         }
     }
