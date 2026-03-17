@@ -1,4 +1,5 @@
 pub mod euler;
+pub mod leapfrog;
 
 use crate::physics::body::Body;
 

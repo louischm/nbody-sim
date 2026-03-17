@@ -1,15 +1,14 @@
 mod physics;
 mod utils;
 mod integrators;
+mod simulation;
 
 use clap::Parser;
 use physics::body::Body;
 use nalgebra::Vector3;
 
-use physics::gravity::compute_accelerations;
-use integrators::euler::EulerIntegrator;
-
-use crate::integrators::Integrator;
+use integrators::leapfrog::LeapfrogIntegrator;
+use simulation::engine::SimulationEngine;
 
 
 #[derive(Parser, Debug)]
@@ -23,7 +22,7 @@ fn main() {
 
     println!("Running simulation with {} steps", args.steps);
 
-    let mut bodies = vec![
+    let bodies = vec![
         Body::new(
             "Sun".to_string(),
             1.989e30,
@@ -38,14 +37,10 @@ fn main() {
         ),
     ];
 
-    let integrator = EulerIntegrator;
+    let integrator = LeapfrogIntegrator;
     let dt = 60.0;
 
-    for _ in 0..10 {
-        compute_accelerations(&mut bodies);
-
-        integrator.step(&mut bodies, dt);
-
-        println!("Earth position: {:?}", bodies[1].position);
-    }
+    let mut engine = SimulationEngine::new(bodies, integrator, dt);
+    
+    engine.run(args.steps);
 }
