@@ -27,7 +27,19 @@ impl<I: Integrator> SimulationEngine<I> {
     }
 
     pub fn run(&mut self, steps: usize) {
+        let initial_energy = total_energy(&self.bodies);
+
         for step in 0..steps {
+            let energy = total_energy(&self.bodies);
+            let relative_error = (energy - initial_energy) / initial_energy.abs();
+
+            println!(
+                "Step {:>5} | E = {:.3e} | Delta = {:.3e} | Rel = {:.3e}",
+                step,
+                energy,
+                energy - initial_energy,
+                relative_error
+            );
             self.step();
 
             if let Some(writer) = &mut self.writer {

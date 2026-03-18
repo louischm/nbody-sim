@@ -11,6 +11,11 @@ A high performance gravitational N-body simulator written in Rust.
 ## Features
 
 - Modular simulation engine
-- Multiple integrators
+- Multiple integrators (Euler and Leapfrog)
 - Diagnostics and energy tracking
-- Configurable simulations
+- Configurable simulations in JSON
+
+![Orbit](orbit.png)
+
+## Run instructions
+cargo run -- --config config/simulation.json --integrator leapfrog
