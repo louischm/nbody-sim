@@ -4,6 +4,7 @@ mod integrators;
 mod simulation;
 mod diagnostics;
 mod config;
+mod output;
 
 use clap::Parser;
 use physics::body::Body;
@@ -13,6 +14,8 @@ use integrators::leapfrog::LeapfrogIntegrator;
 use integrators::euler::EulerIntegrator;
 use simulation::engine::SimulationEngine;
 use config::simulation::load_config;
+use output::csv_writer::CsvWriter;
+use output::plot::plot_orbits;
 
 
 #[derive(Parser, Debug)]
@@ -22,12 +25,12 @@ struct Args {
 }
 
 fn main() {
-    let args = Args::parse();
-
-    println!("Running simulation with {} steps", args.steps);
 
     let config = load_config("config/simulation.json");
-     
+
+    println!("Running simulation with {} steps", config.steps);
+
+
     let bodies = config.bodies.into_iter().map(|b| {
         Body::new(
             b.name,
@@ -38,11 +41,17 @@ fn main() {
     }).collect();
 
     let leapfrog = LeapfrogIntegrator;
-  //  let euler = EulerIntegrator;
+    let writer = CsvWriter::new("output.csv");
 
-    let mut engine_leapfrog = SimulationEngine::new(bodies, leapfrog, config.dt);
-    //let mut engine_euler = SimulationEngine::new(bodies, euler, dt);
+    let mut engine_leapfrog = SimulationEngine::new(
+        bodies,
+        leapfrog,
+        config.dt, 
+        Some(writer),
+    );
     
-    engine_leapfrog.run(args.steps);
-    //engine_euler.run(args.steps);
+    engine_leapfrog.run(config.steps);
+
+    plot_orbits("output.csv", "orbit.png").unwrap();
+
 }
