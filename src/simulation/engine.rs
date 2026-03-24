@@ -2,6 +2,8 @@ use crate::physics::body::Body;
 use crate::integrators::Integrator;
 use crate::physics::gravity::compute_accelerations;
 use crate::diagnostics::energy::total_energy;
+use crate::integrators::euler::EulerIntegrator;
+use crate::integrators::leapfrog::LeapfrogIntegrator;
 use crate::output::csv_writer::CsvWriter;
 
 pub struct SimulationEngine<I: Integrator> {
@@ -67,18 +69,20 @@ mod tests {
                 1.0,
                 Vector3::zeros(),
                 Vector3::zeros(),
+                "yellow",
             ),
             Body::new(
                 "B".to_string(),
                 1.0,
                 Vector3::new(1.0, 0.0, 0.0),
                 Vector3::zeros(),
+                "yellow"
             ),
         ];
 
         let integrator = LeapfrogIntegrator;
 
-        let mut engine = SimulationEngine::new(bodies, integrator, 0.1);
+        let mut engine = SimulationEngine::new(bodies, integrator, 0.1, None);
 
         engine.run(10);
     }

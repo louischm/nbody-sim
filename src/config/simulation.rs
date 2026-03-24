@@ -7,6 +7,7 @@ pub struct BodyConfig {
     pub mass: f64,
     pub position: [f64; 3],
     pub velocity: [f64; 3],
+    pub color: String,
 }
 
 #[derive(Deserialize)]

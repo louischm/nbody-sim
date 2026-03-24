@@ -20,8 +20,8 @@ pub fn plot_orbits(csv_path: &str, output: &str) -> Result<(), Box<dyn Error>> {
 
     let mut chart = ChartBuilder::on(&root)
         .margin(10)
-        .caption("Orbit SImulation", ("sans-serif", 30))
-        .build_cartesian_2d(-2.0e11..2.0e11, -2.0e11..2.0e11)?;
+        .caption("Orbit Simulation", ("sans-serif", 30))
+        .build_cartesian_2d(-6.0e12..6.0e12, -6.0e12..6.0e12)?;
 
     chart.configure_mesh().draw()?;
 

@@ -5,8 +5,11 @@ mod simulation;
 mod diagnostics;
 mod config;
 mod output;
+mod render;
 
+use std::io::empty;
 use clap::Parser;
+use macroquad::input::KeyCode::L;
 use physics::body::Body;
 use nalgebra::Vector3;
 
@@ -16,8 +19,7 @@ use simulation::engine::SimulationEngine;
 use config::simulation::load_config;
 use output::csv_writer::CsvWriter;
 use output::plot::plot_orbits;
-
-use crate::config::simulation::SimulationConfig;
+use macroquad::prelude::*;
 use crate::integrators::Integrator;
 
 
@@ -30,35 +32,58 @@ struct Args {
     integrator: String,
 }
 
-fn main() {
+#[macroquad::main("NBody Simulation")]
+async fn main() {
     let args = Args::parse();
-    let config = load_config("config/simulation.json");
+    let config = load_config(&args.config);
 
     println!("Running simulation with {} steps", config.steps);
 
 
-    let bodies = config.bodies.into_iter().map(|b| {
-        Body::new(
-            b.name,
-            b.mass,
-            Vector3::new(b.position[0], b.position[1], b.position[2]),
-            Vector3::new(b.velocity[0], b.velocity[1], b.velocity[2]),
-        )
-    }).collect();
+    let bodies = config
+        .bodies
+        .into_iter()
+        .map(|b| {
+            Body::new(
+                b.name,
+                b.mass,
+                Vector3::new(b.position[0], b.position[1], b.position[2]),
+                Vector3::new(b.velocity[0], b.velocity[1], b.velocity[2]),
+                b.color.as_str(),
+            )
+        }).collect();
 
-    let integrator_type = args.integrator.as_str();
+    let dt = config.dt;
 
-    match integrator_type {
+    match args.integrator.as_str() {
         "euler" => {
             let integrator = EulerIntegrator;
-            run_simulation(bodies, integrator, config.dt, config.steps);
+            let mut engine = SimulationEngine::new(bodies, integrator, dt, None);
+            loop {
+                clear_background(BLACK);
+
+                engine.step();
+                render::draw_bodies(&engine.bodies);
+
+                next_frame().await;
+            }
         }
         "leapfrog" => {
             let integrator = LeapfrogIntegrator;
-            run_simulation(bodies, integrator, config.dt, config.steps);
+            let mut engine = SimulationEngine::new(bodies, integrator, dt, None);
+            loop {
+                clear_background(BLACK);
+
+                engine.step();
+                render::draw_bodies(&engine.bodies);
+
+                next_frame().await;
+            }
         }
         _ => panic!("Unknown integrator"),
-    }
+    };
+
+
 }
 
 fn run_simulation<I: Integrator>(

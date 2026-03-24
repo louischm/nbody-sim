@@ -6,13 +6,71 @@
             "name": "Sun",
             "mass": 1.989e30,
             "position": [0.0, 0.0, 0.0],
-            "velocity": [0.0, 0.0, 0.0]
+            "velocity": [0.0, 0.0, 0.0],
+            "color": "yellow"
+        },
+        {
+            "name": "Mercury",
+            "mass": 3.3011e23,
+            "position": [5.79e10, 0.0, 0.0],
+            "velocity": [0.0, 47400.0, 0.0],
+            "color": "gray"
+        },
+        {
+            "name": "Venus",
+            "mass": 4.86675e24,
+            "position": [1.082e11, 0.0, 0.0],
+            "velocity": [0.0, 35020.0, 0.0],
+            "color": "beige"
         },
         {
             "name": "Earth",
-            "mass": 5.972e24,
+            "mass": 5.97217e24,
             "position": [1.496e11, 0.0, 0.0],
-            "velocity": [0.0, 29780.0, 0.0]
+            "velocity": [0.0, 29780.0, 0.0],
+            "color": "blue"
+        },
+        {
+            "name": "Mars",
+            "mass": 6.4171e23,
+            "position": [2.279e11, 0.0, 0.0],
+            "velocity": [0.0, 24070.0, 0.0],
+            "color": "red"
+        },
+        {
+            "name": "Jupiter",
+            "mass": 1.898e27,
+            "position": [7.785e11, 0.0, 0.0],
+            "velocity": [0.0, 13070.0, 0.0],
+            "color": "orange"
+        },
+        {
+            "name": "Saturn",
+            "mass": 5.683e26,
+            "position": [1.433e12, 0.0, 0.0],
+            "velocity": [0.0, 9690.0, 0.0],
+            "color": "maroon"
+        },
+        {
+            "name": "Uranus",
+            "mass": 8.681e25,
+            "position": [2.877e12, 0.0, 0.0],
+            "velocity": [0.0, 6810.0, 0.0],
+            "color": "skyblue"
+        },
+        {
+            "name": "Neptune",
+            "mass": 1.024e26,
+            "position": [4.503e12, 0.0, 0.0],
+            "velocity": [0.0, 5430.0, 0.0],
+            "color": "darkblue"
+        },
+        {
+            "name": "Pluto",
+            "mass": 1.303e22,
+            "position": [5.906e12, 0.0, 0.0],
+            "velocity": [0.0, 4740.0, 0.0],
+            "color": "white"
         }
     ]
 }
