@@ -42,6 +42,7 @@ mod tests {
             1.0,
             Vector3::new(0.0, 0.0, 0.0),
             Vector3::zeros(),
+            "yellow"
         );
 
         let b = Body::new(
@@ -49,6 +50,7 @@ mod tests {
             10.0,
             Vector3::new(1.0, 0.0, 0.0),
             Vector3::zeros(),
+            "blue"
         );
 
         let acc = acceleration_between(&a, &b);
@@ -63,13 +65,15 @@ mod tests {
             5.0,
             Vector3::new(0.0, 0.0, 0.0),
             Vector3::zeros(),
+            "yellow"
         );
 
         let b = Body::new(
             "B".to_string(),
             10.0,
             Vector3::new(1.0, 0.0, 0.0),
-            Vector3::zeros()
+            Vector3::zeros(),
+            "blue"
         );
 
         let acc_a = acceleration_between(&a, &b);

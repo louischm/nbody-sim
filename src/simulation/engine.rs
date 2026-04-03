@@ -10,6 +10,7 @@ pub struct SimulationEngine<I: Integrator> {
     pub bodies: Vec<Body>,
     pub integrator: I,
     pub dt: f64,
+    pub time: f64,
     pub writer: Option<CsvWriter>,
 }
 
@@ -19,6 +20,7 @@ impl<I: Integrator> SimulationEngine<I> {
             bodies,
             integrator,
             dt,
+            time: 0.0,
             writer,
         }
     }
@@ -26,6 +28,7 @@ impl<I: Integrator> SimulationEngine<I> {
     pub fn step(&mut self) {
         compute_accelerations(&mut self.bodies);
         self.integrator.step(&mut self.bodies, self.dt);
+        self.time += self.dt;
     }
 
     pub fn run(&mut self, steps: usize) {

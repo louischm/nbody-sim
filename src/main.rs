@@ -6,6 +6,7 @@ mod diagnostics;
 mod config;
 mod output;
 mod render;
+mod server;
 
 use std::io::empty;
 use clap::Parser;
@@ -20,6 +21,7 @@ use config::simulation::load_config;
 use output::csv_writer::CsvWriter;
 use output::plot::plot_orbits;
 use macroquad::prelude::*;
+use crate::config::simulation::BodyConfig;
 use crate::integrators::Integrator;
 
 
@@ -30,11 +32,64 @@ struct Args {
 
     #[arg(short, long, default_value = "leapfrog")]
     integrator: String,
+
+    #[arg(short, long, default_value = "gui")]
+    mode: String,
+
+    #[arg(short, long, default_value = "3000")]
+    port: u16,
 }
 
-#[macroquad::main("NBody Simulation")]
-async fn main() {
+fn main() {
     let args = Args::parse();
+
+    if args.mode == "server" {
+        // Run server mode with Tokio runtime
+        tokio::runtime::Runtime::new()
+            .unwrap()
+            .block_on(run_server_mode(args));
+    } else {
+        // Run GUI mode with macroquad
+        macroquad::Window::new("NBody Simulation", run_gui_mode_wrapper(args));
+    }
+}
+
+fn run_gui_mode_wrapper(args: Args) -> impl std::future::Future<Output = ()> {
+    async move {
+        run_gui_mode(args).await;
+    }
+}
+
+async fn run_server_mode(args: Args) {
+    use std::net::SocketAddr;
+    use server::state::AppState;
+
+    let config = load_config(&args.config);
+    let bodies = parse_bodies_from_config(config.bodies);
+    let addr = SocketAddr::from(([0, 0, 0, 0], args.port));
+    
+    match args.integrator.as_str() {
+        "euler" => {
+            let integrator = EulerIntegrator;
+            let engine = SimulationEngine::new(bodies, integrator, config.dt, None);
+            let state = AppState::new(engine);
+
+            println!("Starting server on http://localhost:{}", args.port);
+            server::run_server(addr, state).await.unwrap();
+        }
+        "leapfrog" => {
+            let integrator = LeapfrogIntegrator;
+            let engine = SimulationEngine::new(bodies, integrator, config.dt, None);
+            let state = AppState::new(engine);
+
+            println!("Starting server on http://localhost:{}", args.port);
+            server::run_server(addr, state).await.unwrap();
+        }
+        _ => panic!("Unknown integrator"),
+    }
+}
+
+async fn run_gui_mode(args: Args) {
     let config = load_config(&args.config);
 
     println!("Running simulation with {} steps", config.steps);
@@ -82,8 +137,21 @@ async fn main() {
         }
         _ => panic!("Unknown integrator"),
     };
+}
 
-
+fn parse_bodies_from_config(body_configs: Vec<BodyConfig>) -> Vec<Body> {
+    body_configs
+        .into_iter()
+        .map(|b| {
+            Body::new(
+                b.name,
+                b.mass,
+                Vector3::new(b.position[0], b.position[1], b.position[2]),
+                Vector3::new(b.velocity[0], b.velocity[1], b.velocity[2]),
+                b.color.as_str(),
+            )
+        })
+        .collect()
 }
 
 fn run_simulation<I: Integrator>(

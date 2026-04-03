@@ -24,6 +24,7 @@ mod tests {
             1.0,
             Vector3::zeros(),
             Vector3::zeros(),
+            "yellow"
         );
 
         body.acceleration = Vector3::new(1.0, 0.0, 0.0);
